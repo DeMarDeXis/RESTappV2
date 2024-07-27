@@ -7,6 +7,7 @@ import (
 
 type Authorization interface {
 	CreateUser(user gorestapiv2.User) (int, error)
+	GetUser(username, password string) (gorestapiv2.User, error)
 }
 
 type TodoList interface {
