@@ -1,6 +1,12 @@
 package service
 
+import (
+	gorestapiv2 "github.com/DeMarDeXis/RESTV1"
+	"github.com/DeMarDeXis/RESTV1/pkg/storage"
+)
+
 type Authorization interface {
+	CreateUser(user gorestapiv2.User) (int, error)
 }
 
 type TodoList interface {
@@ -15,6 +21,8 @@ type Service struct {
 	TodoItem
 }
 
-func NewService() *Service {
-	return &Service{}
+func NewService(strg *storage.Storage) *Service {
+	return &Service{
+		Authorization: NewAuthService(strg.Authorization),
+	}
 }

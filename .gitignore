@@ -1,1 +1,4 @@
-guide.txt
+*.txt
+.env
+Taskfile.yaml
+config/
