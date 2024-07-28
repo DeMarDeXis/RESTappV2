@@ -1,8 +1,10 @@
 package main
 
-// 5 31
 import (
+	"context"
 	"os"
+	"os/signal"
+	"syscall"
 
 	gorestapiv2 "github.com/DeMarDeXis/RESTV1"
 	"github.com/DeMarDeXis/RESTV1/pkg/handler"
@@ -41,9 +43,29 @@ func main() {
 	handlers := handler.NewHandler(services)
 
 	srv := new(gorestapiv2.Server)
-	if err := srv.Start(viper.GetString("port"), handlers.InitRoutes()); err != nil {
-		logrus.Fatalf("error occured while running http server: %s", err.Error())
+	go func() {
+		if err := srv.Start(viper.GetString("port"), handlers.InitRoutes()); err != nil {
+			logrus.Fatalf("error occured while running http server: %s", err.Error())
+		}
+	}()
+
+	logrus.Print("TodoApp started")
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+
+	logrus.Print("TodoApp shutting down")
+
+	if err := srv.Shutdown(context.Background()); err != nil {
+		logrus.Fatalf("error occured while shutting down http server: %s", err.Error())
 	}
+
+	if err := db.Close(); err != nil {
+		logrus.Fatalf("error occured while closing db connection: %s", err.Error())
+	}
+
+	logrus.Print("TodoApp stopped")
 }
 
 func InitConfig() error {

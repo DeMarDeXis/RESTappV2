@@ -2,3 +2,4 @@
 .env
 Taskfile.yaml
 config/
+pkg/storage/
